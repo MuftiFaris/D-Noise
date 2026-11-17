@@ -54,6 +54,15 @@ async function main(){
   el('#analysis-method').value='1';el('#analysis-method').onchange();
   assert(el('#summary-analysis').innerHTML.includes('Adaptive Median'));
   assert(!el('#summary-analysis').innerHTML.includes('Gaussian Filter'));
+  assert(el('#summary-analysis').innerHTML.includes('data-filter="profile"'));
+  assert(el('#summary-analysis').innerHTML.includes('data-filter="histogram"'));
+  el('#analysis-method').value='0';el('#analysis-method').onchange();
+  assert(el('#summary-analysis').innerHTML.includes('Median Filter'));
+  assert(!el('#summary-analysis').innerHTML.includes('Adaptive Median'));
+  assert(!el('#summary-analysis').innerHTML.includes('Gaussian Filter'));
+  el('#analysis-method').value='all';el('#analysis-method').onchange();
+  assert(el('#summary-analysis').innerHTML.includes('Adaptive Median'));
+  assert(el('#summary-analysis').innerHTML.includes('Gaussian Filter'));
   const psnr=evaluate("metricChart(analysisSeries(),'psnr')");assert(psnr.includes('∞'));assert(!/NaN|undefined|Infinity%/.test(psnr));
   failure=1;await noise[2].onclick();
   assert.equal(el('#method-state-1').textContent,'Terhenti');assert.equal(evaluate('state.busy'),false);

@@ -21,6 +21,7 @@ function renderCards(){
 }
 function clearResults(){
   state.session=null;state.results=[null,null,null];$('#summary-panel').hidden=true;$('#run-count').textContent='0 / 3 selesai';
+  if(typeof chartSelection!=='undefined'){chartSelection.profile='all';chartSelection.histogram='all';}
   renderCards();$('#noisy-image').hidden=true;$('#noise-placeholder').hidden=false;$('#noise-caption').textContent='Belum dibuat';
   $('#noise-description').textContent='Pilih persentase noise untuk memulai perbandingan.';setBusy(false);
 }
