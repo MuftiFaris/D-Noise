@@ -1,10 +1,16 @@
 <!doctype html>
 <html lang="id">
 <head>
-  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="Bandingkan pemulihan citra dengan tiga filter manual dan grafik dari piksel nyata.">
   <title>Ruang Citra — Perbandingan Denoising</title>
-  <link rel="stylesheet" href="/lab.css"><script src="/app.js" defer></script><script src="/charts.js" defer></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/lab.css?v=5">
+  <script src="/app.js?v=5" defer></script>
+  <script src="/charts.js?v=5" defer></script>
 </head>
 <body>
   <a class="skip-link" href="#workspace">Lewati ke eksperimen</a>
@@ -36,12 +42,13 @@
           <div class="analysis-toolbar"><label class="chart-control">Bandingkan <select id="analysis-method"><option value="all">Semua metode</option><option value="0">Median</option><option value="1">Adaptive Median</option><option value="2">Gaussian</option></select></label><button id="download-chart-csv" class="quiet" disabled>Unduh data grafik</button></div><div id="summary-analysis"></div>
           <p class="support">SSIM memakai rata-rata blok 8×8 tidak tumpang tindih. PSNR acuan identik adalah ∞. Angka tampilan dibulatkan; CSV menyimpan presisi perhitungan.</p>
         </section>
+        <section id="catatan" class="method-notes"><div><p class="eyebrow">TENTANG EKSPERIMEN</p><h2>Visual di layar, rumus di kode.</h2><p>Seluruh hasil dan grafik berasal dari piksel percobaan yang sedang berjalan.</p></div><div>
+          <details><summary>Konfigurasi perbandingan</summary><p>Median 3×3, Adaptive Median 3×3 sampai 7×7, dan Gaussian 3×3 dengan sigma ≈ 0,8493218. Ketiganya memakai replicate padding dan citra noisy yang sama. Semua metrik menggunakan citra asli sebagai acuan.</p></details>
+          <details><summary>Letak rumus manual</summary><p>Folder <code>rumus_manual/</code>: <code>filters.py</code> untuk tiga filter, <code>noise.py</code> untuk salt-and-pepper, <code>metrics.py</code> untuk MSE/PSNR/SSIM, dan <code>analysis.py</code> untuk histogram serta profil intensitas. Tidak menggunakan fungsi filter atau metrik library pihak ketiga.</p></details>
+          <details><summary>Animasi dan data</summary><p>Pratinjau dikirim dari baris keluaran yang benar-benar selesai dihitung. Transisi tampilan membantu membaca perubahan; bukan simulasi hasil filter. Citra berasal dari <a href="https://github.com/cszn/FFDNet/tree/master/testsets/Set12" target="_blank" rel="noreferrer">Set12 / FFDNet</a>.</p></details>
+        </div></section>
+        <footer class="footer"><span>Ruang Citra</span><span>Restorasi citra, dilihat dari perubahannya.</span><a href="#workspace">Kembali ke atas ↑</a></footer>
       </section>
     </div>
-    <section id="catatan" class="method-notes"><div><p class="eyebrow">TENTANG EKSPERIMEN</p><h2>Visual di layar, rumus di kode.</h2><p>Seluruh hasil dan grafik berasal dari piksel percobaan yang sedang berjalan.</p></div><div>
-      <details><summary>Konfigurasi perbandingan</summary><p>Median 3×3, Adaptive Median 3×3 sampai 7×7, dan Gaussian 3×3 dengan sigma ≈ 0,8493218. Ketiganya memakai replicate padding dan citra noisy yang sama. Semua metrik menggunakan citra asli sebagai acuan.</p></details>
-      <details><summary>Letak rumus manual</summary><p>Folder <code>rumus_manual/</code>: <code>filters.py</code> untuk tiga filter, <code>noise.py</code> untuk salt-and-pepper, <code>metrics.py</code> untuk MSE/PSNR/SSIM, dan <code>analysis.py</code> untuk histogram serta profil intensitas. Tidak menggunakan fungsi filter atau metrik library pihak ketiga.</p></details>
-      <details><summary>Animasi dan data</summary><p>Pratinjau dikirim dari baris keluaran yang benar-benar selesai dihitung. Transisi tampilan membantu membaca perubahan; bukan simulasi hasil filter. Citra berasal dari <a href="https://github.com/cszn/FFDNet/tree/master/testsets/Set12" target="_blank" rel="noreferrer">Set12 / FFDNet</a>.</p></details>
-    </div></section>
-  </main><footer class="footer"><span>Ruang Citra</span><span>Restorasi citra, dilihat dari perubahannya.</span><a href="#workspace">Kembali ke eksperimen ↑</a></footer>
+  </main>
 </body></html>
