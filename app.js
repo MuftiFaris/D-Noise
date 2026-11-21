@@ -126,5 +126,31 @@ document.querySelectorAll('[data-noise]').forEach(b=>b.onclick=()=>{
   document.querySelectorAll('[data-noise]').forEach(x=>{x.classList.toggle('selected',x===b);x.setAttribute('aria-pressed',String(x===b));});return runExperiment();
 });
 $('#seed-input').oninput=()=>{if(!state.busy){clearResults();$('#state-label').textContent='Seed berubah';status('Seed berubah. Tekan Jalankan ulang atau pilih noise untuk membuat hasil baru.');}};
+$('#png-upload').onchange=async(e)=>{
+  const file=e.target.files[0];if(!file)return;
+  const statusEl=$('#upload-status');
+  if(!file.name.toLowerCase().endsWith('.png')){
+    statusEl.textContent='❌ Hanya file PNG yang diterima.';statusEl.style.color='#FFA4A4';
+    e.target.value='';return;
+  }
+  statusEl.textContent='Memproses…';statusEl.style.color='var(--color-text-secondary)';
+  try{
+    const formData=new FormData();formData.append('file',file);
+    const response=await fetch('/api/upload',{method:'POST',body:formData});
+    if(!response.ok){const error=await response.json();throw new Error(error.error||'Upload gagal.');}
+    const data=await response.json();
+    statusEl.textContent=`✓ ${data.message}`;statusEl.style.color='#4EABA6';
+    state.name=data.filename;state.noise=null;clearResults();
+    document.querySelectorAll('[data-image]').forEach(b=>{b.classList.remove('selected');b.setAttribute('aria-pressed','false');});
+    document.querySelectorAll('[data-noise]').forEach(b=>{b.classList.remove('selected');b.setAttribute('aria-pressed','false');});
+    $('#selected-name').textContent=`Terpilih: ${data.filename} (${data.width}×${data.height})`;
+    const img=new Image();img.onload=()=>{$('#original-image').src=img.src;$('#original-image').hidden=false;$('#original-placeholder').hidden=true;};img.src='/uploads/'+encodeURIComponent(data.filename);
+    $('#experiment-meta').textContent=data.filename;$('#state-label').textContent='Pilih noise';status('Citra unggahan siap. Pilih persentase noise untuk menjalankan perbandingan.');
+    e.target.value='';
+  }catch(error){
+    statusEl.textContent=`❌ ${error.message}`;statusEl.style.color='#FFA4A4';
+    e.target.value='';
+  }
+};
 $('#prepare-button').onclick=runExperiment;$('#analysis-method').onchange=()=>renderCombinedAnalysis();$('#download-csv').onclick=downloadCsv;$('#download-chart-csv').onclick=()=>downloadChartCsv();
 renderCards();loadGallery();

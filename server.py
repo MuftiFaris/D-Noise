@@ -71,11 +71,31 @@ class Handler(SimpleHTTPRequestHandler):
         if self.path == "/api/images":
             self.send_json(200, {"images": sorted(p.name for p in DATA.glob("*.png"))})
             return
+        # Serve uploaded files
+        if self.path.startswith("/uploads/"):
+            filename = self.path.split("/uploads/", 1)[1]
+            if "/" in filename or filename.startswith("."):
+                self.send_error(403)
+                return
+            upload_file = ROOT / "uploads" / filename
+            if upload_file.exists() and upload_file.is_file():
+                self.send_response(200)
+                self.send_header("Content-Type", "image/png")
+                self.send_header("Cache-Control", "private, max-age=3600")
+                self.end_headers()
+                with open(upload_file, 'rb') as f:
+                    self.wfile.write(f.read())
+                return
+            self.send_error(404)
+            return
         super().do_GET()
 
     def do_POST(self):
         if self.path in ('/api/prepare', '/api/trace', '/api/process'):
             self.do_lesson()
+            return
+        if self.path == "/api/upload":
+            self.do_upload()
             return
         if self.path != "/api/run":
             self.send_json(404, {"error": "Halaman tidak ditemukan."})
@@ -83,15 +103,23 @@ class Handler(SimpleHTTPRequestHandler):
         try:
             body = json.loads(self.rfile.read(int(self.headers.get("Content-Length", "0"))))
             name = str(body.get("image", ""))
-            if Path(name).name != name or not name.endswith(".png") or not (DATA / name).is_file():
-                raise ValueError("Pilih gambar dari dataset Set12.")
+            
+            # Check if from Set12 or uploads
+            if name.startswith("upload_"):
+                filepath = ROOT / "uploads" / name
+            else:
+                filepath = DATA / name
+            
+            if Path(name).name != name or not name.endswith(".png") or not filepath.is_file():
+                raise ValueError("Pilih gambar yang valid.")
+            
             level, seed = int(body.get("noise", 10)), int(body.get("seed", 42))
             if level not in (5, 10, 20, 30):
                 raise ValueError("Pilih tingkat noise 5%, 10%, 20%, atau 30%.")
             if not 0 <= seed <= 2147483647:
                 raise ValueError("Seed harus di antara 0 dan 2147483647.")
 
-            clean = read_png_gray(DATA / name)
+            clean = read_png_gray(filepath)
             noisy = add_salt_pepper(clean, level, seed)
             outputs = [median_filter(noisy, 3), adaptive_median_filter(noisy, 7), gaussian_filter(noisy)]
             labels = ["Median Filter", "Adaptive Median", "Gaussian Filter"]
@@ -106,6 +134,103 @@ class Handler(SimpleHTTPRequestHandler):
             self.send_json(400, {"error": str(exc)})
         except Exception as exc:
             self.send_json(500, {"error": f"Pengolahan gagal: {exc}"})
+
+    def log_message(self, format, *args):
+        print("[website] " + format % args)
+
+    def do_upload(self):
+        """Handle PNG upload with grayscale validation."""
+        try:
+            length = int(self.headers.get("Content-Length", "0"))
+            if length < 1 or length > 5242880:  # 5MB limit
+                raise ValueError("Ukuran file terlalu besar (max 5MB).")
+            
+            content_type = self.headers.get("Content-Type", "")
+            if "multipart/form-data" not in content_type:
+                raise ValueError("Tipe konten harus multipart/form-data.")
+            
+            # Parse multipart form data
+            import re
+            boundary = re.search(r'boundary=([^\s;]+)', content_type).group(1)
+            body = self.rfile.read(length)
+            
+            # Find PNG data between boundaries
+            parts = body.split(('--' + boundary).encode())
+            png_data = None
+            
+            for part in parts:
+                if b'filename=' in part:
+                    # Extract PNG data from multipart
+                    header_end = part.find(b'\r\n\r\n')
+                    if header_end != -1:
+                        png_data = part[header_end+4:]
+                        # Remove trailing boundary markers
+                        png_data = png_data.rstrip(b'\r\n--')
+                        break
+            
+            if not png_data:
+                raise ValueError("Tidak ada file PNG ditemukan.")
+            
+            # Validate PNG signature
+            if not png_data.startswith(b'\x89PNG\r\n\x1a\n'):
+                raise ValueError("File bukan PNG yang valid.")
+            
+            # Parse PNG header to check color type (must be 0 = grayscale)
+            import struct
+            if len(png_data) < 24:
+                raise ValueError("File PNG terlalu kecil.")
+            
+            # Find IHDR chunk (starts at byte 8)
+            ihdr_length = struct.unpack(">I", png_data[8:12])[0]
+            ihdr_type = png_data[12:16]
+            
+            if ihdr_type != b'IHDR':
+                raise ValueError("Struktur PNG tidak valid.")
+            
+            # Parse IHDR: width, height, bit depth, color type
+            if len(png_data) < 16 + ihdr_length:
+                raise ValueError("File PNG rusak.")
+            
+            ihdr_data = png_data[16:16+ihdr_length]
+            width, height, bit_depth, color_type = struct.unpack(">IIBBB", ihdr_data[:13])
+            
+            # Color type: 0=grayscale, 2=RGB, 3=indexed, 4=gray+alpha, 6=RGBA
+            if color_type != 0:
+                color_names = {0: "Grayscale", 2: "RGB", 3: "Indexed", 4: "Grayscale+Alpha", 6: "RGBA"}
+                raise ValueError(f"Gambar harus grayscale 8-bit. Terdeteksi: {color_names.get(color_type, 'Tipe tidak dikenal')} (type {color_type}).")
+            
+            if bit_depth != 8:
+                raise ValueError(f"Gambar harus 8-bit. Terdeteksi: {bit_depth}-bit.")
+            
+            # Save to uploads directory
+            upload_dir = ROOT / "uploads"
+            upload_dir.mkdir(exist_ok=True)
+            
+            # Generate filename
+            filename = f"upload_{uuid.uuid4().hex[:8]}.png"
+            filepath = upload_dir / filename
+            
+            with open(filepath, 'wb') as f:
+                f.write(png_data)
+            
+            # Verify by reading
+            try:
+                image = read_png_gray(filepath)
+            except Exception as e:
+                filepath.unlink()
+                raise ValueError(f"Gambar tidak dapat dibaca: {e}")
+            
+            self.send_json(200, {
+                "success": True,
+                "filename": filename,
+                "width": width,
+                "height": height,
+                "message": f"Gambar {width}×{height} berhasil diunggah."
+            })
+        except ValueError as e:
+            self.send_json(400, {"error": str(e)})
+        except Exception as e:
+            self.send_json(500, {"error": f"Upload gagal: {str(e)}"})
 
     def log_message(self, format, *args):
         print("[website] " + format % args)

@@ -235,69 +235,29 @@ p {
 }
 
 /* ==========================================================================
-   Header & Masthead
+   Header — Centered, Rounded Bottom + Sides
    ========================================================================== */
-.masthead {
-  max-width: 1540px;
-  margin: auto;
-  padding: 14px 36px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 24px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  background: var(--color-surface-header);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-}
-
-.wordmark {
-  font-family: var(--font-display);
-  font-size: 19px;
-  text-decoration: none;
-  color: var(--color-text-white);
-  font-weight: 700;
-  letter-spacing: -0.5px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.wordmark span {
-  display: inline-block;
-  color: var(--color-pink);
-  font: 11px/1.4 var(--font-mono);
-  font-weight: 500;
-  letter-spacing: 0.8px;
-  text-transform: uppercase;
-  background: rgba(218, 123, 147, 0.14);
-  padding: 3px 8px;
-  border-radius: 4px;
+.masthead-simple {
+  background: var(--color-burgundy);
   border: 1px solid rgba(218, 123, 147, 0.25);
+  border-top: none;
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+  padding: 12px 24px;
+  margin: 0 auto;
+  max-width: 320px;
+  width: calc(100% - 48px);
 }
 
-.masthead nav {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-}
-
-.masthead nav a {
-  color: var(--color-text-secondary);
-  font-size: 13px;
-  font-weight: 500;
-  text-decoration: none;
-  white-space: nowrap;
-  padding: 6px 14px;
-  border-radius: var(--radius-sm);
-  border: 1px solid transparent;
-  transition: all 0.2s ease;
-}
-
-.masthead nav a:hover {
-  color: var(--color-pink);
-  background: rgba(218, 123, 147, 0.1);
-  border-color: rgba(218, 123, 147, 0.25);
+.wordmark-simple {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+  color: var(--color-text-white);
+  margin: 0;
+  line-height: 1.2;
+  text-align: center;
 }
 
 /* ==========================================================================
@@ -655,6 +615,29 @@ input {
   padding: 8px 12px;
   font: 12px/1.4 var(--font-mono);
   transition: all 0.2s ease;
+}
+
+input[type="file"] {
+  padding: 6px;
+  cursor: pointer;
+}
+
+input[type="file"]::file-selector-button {
+  background: rgba(218, 123, 147, 0.2);
+  border: 1px solid rgba(218, 123, 147, 0.4);
+  color: var(--color-text-white);
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  margin-right: 8px;
+}
+
+input[type="file"]::file-selector-button:hover {
+  background: rgba(218, 123, 147, 0.35);
+  border-color: var(--color-pink);
 }
 
 input:focus-visible, select:focus-visible {
