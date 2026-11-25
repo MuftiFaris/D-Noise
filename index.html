@@ -16,7 +16,7 @@
   <a class="skip-link" href="#workspace">Lewati ke eksperimen</a>
   <header class="masthead"><a class="wordmark" href="/">Ruang Citra<span>Laboratorium denoising</span></a><nav aria-label="Navigasi utama"><a href="#catatan">Tentang eksperimen ↓</a></nav></header>
   <main class="page">
-    <div class="page-heading"><div><p class="eyebrow">PENGOLAHAN CITRA / FILTER SPASIAL</p><h1>Dari noise, kembali ke detail.</h1></div><p>Pilih foto dan tingkat noise. Amati tiga filter memulihkan citra yang sama, lalu bandingkan hasilnya.</p></div>
+    <div class="page-heading"><div><p class="eyebrow">PENGOLAHAN CITRA / FILTER SPASIAL</p><h1>Dari noise, kembali ke detail.</h1></div></div>
     <div class="lab-layout">
       <aside class="setup" aria-label="Pengaturan eksperimen"><fieldset id="configuration">
         <div class="section-label"><h2>01 / Pilih citra</h2><span id="gallery-count">Memuat…</span></div>
@@ -24,7 +24,7 @@
         <div class="control-group"><label>02 / Pilih tingkat noise</label><div class="noise-options" role="group" aria-label="Persentase salt-and-pepper noise"><button type="button" data-noise="5" aria-pressed="false" disabled>5%</button><button type="button" data-noise="10" aria-pressed="false" disabled>10%</button><button type="button" data-noise="20" aria-pressed="false" disabled>20%</button><button type="button" data-noise="30" aria-pressed="false" disabled>30%</button></div><p class="support">Setelah dipilih, noise dan ketiga filter langsung diproses.</p></div>
         <div class="control-group"><label for="seed-input">Seed pengacakan</label><input id="seed-input" type="number" min="0" max="2147483647" step="1" value="42"><p class="support">Seed sama mengulang pola noise yang sama.</p></div>
         <button id="prepare-button" class="primary full" type="button" disabled>Jalankan ulang <span aria-hidden="true">↻</span></button>
-      </fieldset><p class="setup-note">Rumus filter dan metrik ditulis manual dalam folder <code>rumus_manual/</code>.</p></aside>
+      </fieldset></aside>
       <section id="workspace" class="workspace visual-workspace" aria-label="Perbandingan citra">
         <div class="workspace-top"><span id="experiment-meta">Eksperimen baru</span><span id="state-label">Pilih citra</span></div>
         <p id="status" class="status" role="status" aria-live="polite">Pilih foto dari galeri, lalu pilih persentase noise.</p>
