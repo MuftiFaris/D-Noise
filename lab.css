@@ -239,16 +239,17 @@ p {
    ========================================================================== */
 .masthead {
   max-width: 400px;
-  margin: 20px auto;
+  margin: 0 auto;
   padding: 12px 20px;
   display: flex;
   justify-content: center;
   align-items: center;
-  border-radius: 10px;
+  border-radius: 10px 10px 10px 10px;
   background: var(--color-surface-header);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border: 1px solid rgba(218, 123, 147, 0.2);
+  border-top: none;
 }
 
 .wordmark {
