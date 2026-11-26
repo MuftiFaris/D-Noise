@@ -234,4 +234,8 @@ if __name__ == "__main__":
     if not any(DATA.glob("*.png")):
         raise SystemExit(f"Dataset Set12 tidak ditemukan: {DATA}")
     print(f"Website siap dibuka: http://127.0.0.1:{args.port}")
-    ThreadingHTTPServer(("127.0.0.1", args.port), Handler).serve_forever()
+    try:
+        ThreadingHTTPServer(("127.0.0.1", args.port), Handler).serve_forever()
+    except KeyboardInterrupt:
+        print("\nServer shutdown.")
+        pass
